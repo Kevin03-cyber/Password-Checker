@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Password Checker</title>
     <style>
+        :root { color-scheme: dark; }
+
         * { box-sizing: border-box; }
 
         body {
@@ -12,8 +14,8 @@
             min-height: 100vh;
             padding: 40px 16px;
             font-family: "Segoe UI", Arial, sans-serif;
-            color: #1f2937;
-            background: linear-gradient(135deg, #4f46e5, #9333ea, #ec4899);
+            color: #e2e8f0;
+            background: linear-gradient(135deg, #0f172a, #1e1b4b, #3b0764);
             display: flex;
             justify-content: center;
             align-items: flex-start;
@@ -25,43 +27,52 @@
             margin: 0 0 4px;
             text-align: center;
             font-size: 2rem;
-            color: white;
+        }
+
+        .title-text {
+            background: linear-gradient(90deg, #22d3ee, #a78bfa, #f472b6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
         }
 
         .subtitle {
             margin: 0 0 24px;
             text-align: center;
-            color: #f3e8ff;
+            color: #94a3b8;
         }
 
         .card {
-            background: white;
+            background: rgba(30, 41, 59, 0.85);
+            border: 1px solid rgba(148, 163, 184, 0.2);
             border-radius: 16px;
             padding: 24px;
             margin-bottom: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
         }
 
         .card h2 {
             margin: 0 0 14px;
             font-size: 1.2rem;
-            color: #4f46e5;
+            color: #a78bfa;
         }
 
         .input-row { display: flex; gap: 8px; }
 
         input[type="password"],
-        input[type="text"],
-        input[type="number"] {
+        input[type="text"] {
             width: 100%;
             padding: 12px 14px;
             font-size: 1rem;
-            border: 2px solid #e5e7eb;
+            color: #e2e8f0;
+            background: #0f172a;
+            border: 2px solid #334155;
             border-radius: 10px;
             outline: none;
         }
 
-        input:focus { border-color: #9333ea; }
+        input::placeholder { color: #64748b; }
+        input:focus { border-color: #22d3ee; }
 
         .btn {
             padding: 12px 18px;
@@ -71,24 +82,26 @@
             cursor: pointer;
             border: none;
             border-radius: 10px;
-            background: linear-gradient(135deg, #4f46e5, #9333ea);
+            background: linear-gradient(135deg, #6366f1, #a855f7);
         }
 
         .btn:hover { opacity: 0.9; }
-        .btn-alt { background: linear-gradient(135deg, #ec4899, #f97316); }
 
         .btn-small {
             padding: 12px 14px;
             font-size: 0.9rem;
             font-weight: 600;
             cursor: pointer;
-            color: #4f46e5;
-            background: #ede9fe;
+            color: #c4b5fd;
+            background: #312e81;
             border: none;
             border-radius: 10px;
         }
 
-        .check-btn { width: 100%; margin-top: 12px; }
+        .btn-small:hover { background: #3730a3; }
+
+        .full-btn { width: 100%; }
+        .check-btn { margin-top: 12px; }
 
         .badge {
             display: inline-block;
@@ -102,7 +115,7 @@
         .bar-bg {
             height: 12px;
             overflow: hidden;
-            background: #e5e7eb;
+            background: #334155;
             border-radius: 999px;
         }
 
@@ -116,7 +129,7 @@
         .bar.medium { width: 66%; }
         .bar.strong { width: 100%; }
 
-        .tips { margin: 14px 0 0; padding-left: 20px; color: #4b5563; }
+        .tips { margin: 14px 0 0; padding-left: 20px; color: #cbd5e1; }
         .tips li { margin-bottom: 4px; }
 
         .alert {
@@ -126,54 +139,63 @@
             font-size: 0.95rem;
         }
 
-        .alert.danger { background: #fee2e2; color: #991b1b; }
-        .alert.safe { background: #dcfce7; color: #166534; }
-        .alert.warn { background: #fef3c7; color: #92400e; }
+        .alert.danger {
+            background: rgba(239, 68, 68, 0.15);
+            color: #fca5a5;
+            border: 1px solid rgba(239, 68, 68, 0.4);
+        }
 
-        .length-row { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
-        .length-row input { width: 100px; }
+        .alert.safe {
+            background: rgba(34, 197, 94, 0.15);
+            color: #86efac;
+            border: 1px solid rgba(34, 197, 94, 0.4);
+        }
 
-        .btn-row { display: flex; gap: 10px; flex-wrap: wrap; }
+        .alert.warn {
+            background: rgba(245, 158, 11, 0.15);
+            color: #fcd34d;
+            border: 1px solid rgba(245, 158, 11, 0.4);
+        }
 
         .generated {
             display: flex;
             align-items: center;
             justify-content: space-between;
             gap: 10px;
-            margin-top: 16px;
+            margin-top: 12px;
             padding: 12px 14px;
-            background: #f5f3ff;
-            border: 2px dashed #9333ea;
+            background: #0f172a;
+            border: 2px dashed #22d3ee;
             border-radius: 10px;
         }
 
         .generated code {
             font-size: 1.05rem;
             font-weight: 600;
-            color: #4c1d95;
+            color: #67e8f9;
             word-break: break-all;
         }
 
         .footer {
             text-align: center;
             font-size: 0.85rem;
-            color: #f3e8ff;
+            color: #94a3b8;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🔐 Password Checker</h1>
-        <p class="subtitle">Check strength, find leaks, and create strong passwords</p>
+        <h1>🔐 <span class="title-text">Password Checker</span></h1>
+        <p class="subtitle">Check strength, find leaks, and get memorable passwords</p>
 
-        <div class="card">
+                <div class="card">
             <h2>Check a password</h2>
-            <form method="POST">
+            <form method="POST" action="/">
                 <div class="input-row">
                     <input type="password" id="pw" name="password" placeholder="Type a password">
                     <button type="button" id="toggleBtn" class="btn-small" onclick="togglePassword()">Show</button>
                 </div>
-                <button type="submit" class="btn check-btn">Check</button>
+                <button type="submit" class="btn full-btn check-btn">Check</button>
             </form>
         </div>
 
@@ -204,23 +226,17 @@
         {% endif %}
 
         <div class="card">
-            <h2>Password generator</h2>
+            <h2>Password suggestions</h2>
             <form method="POST" action="/generate">
-                <div class="length-row">
-                    <label for="length">Length</label>
-                    <input type="number" id="length" name="length" value="16" min="12" max="64">
-                </div>
-                <div class="btn-row">
-                    <button type="submit" name="kind" value="random" class="btn">Random password</button>
-                    <button type="submit" name="kind" value="passphrase" class="btn btn-alt">Easy-to-remember passphrase</button>
-                </div>
+                <button type="submit" class="btn full-btn">Suggest memorable passwords</button>
             </form>
 
-            {% if generated %}
-            <div class="generated">
-                <code id="generated">{{ generated }}</code>
-                <button type="button" id="copyBtn" class="btn-small" onclick="copyPassword()">Copy</button>
-            </div>
+            {% if suggestions %}
+                {% for s in suggestions %}
+                <div class="generated">
+                    <code id="sug{{ loop.index }}">{{ s }}</code>
+                      <button type="button" class="btn-small copy-btn" data-target="sug{{ loop.index }}">Copy</button>                </div>
+                {% endfor %}
             {% endif %}
         </div>
 
@@ -240,11 +256,41 @@
             }
         }
 
-        function copyPassword() {
-            var text = document.getElementById("generated").textContent;
-            navigator.clipboard.writeText(text);
-            document.getElementById("copyBtn").textContent = "Copied!";
+                function fallbackCopy(text) {
+            var temp = document.createElement("textarea");
+            temp.value = text;
+            temp.style.position = "fixed";
+            temp.style.opacity = "0";
+            document.body.appendChild(temp);
+            temp.select();
+            var ok = document.execCommand("copy");
+            document.body.removeChild(temp);
+            return ok;
         }
+
+        function copyText(text, button) {
+            var done = function () { button.textContent = "Copied!"; };
+            var failed = function () {
+                if (fallbackCopy(text)) {
+                    done();
+                } else {
+                    button.textContent = "Select and Ctrl+C";
+                }
+            };
+            try {
+                navigator.clipboard.writeText(text).then(done, failed);
+            } catch (e) {
+                failed();
+            }
+        }
+
+        var copyButtons = document.querySelectorAll(".copy-btn");
+        copyButtons.forEach(function (button) {
+            button.addEventListener("click", function () {
+                var text = document.getElementById(button.dataset.target).textContent;
+                copyText(text, button);
+            });
+        });
     </script>
 </body>
 </html>

@@ -12,17 +12,26 @@ COMMON_PASSWORDS = {
     "qwerty", "abc123", "iloveyou", "admin", "welcome",
     "letmein", "111111", "football", "monkey", "dragon",
 }
-WORDS = [
-    "apple", "river", "tiger", "cloud", "lamp", "ocean", "pencil", "garden", "rocket", "window",
-    "forest", "candle", "bridge", "orange", "planet", "guitar", "silver", "button", "castle", "dragon",
-    "flower", "hammer", "island", "jungle", "kitten", "ladder", "magnet", "napkin", "pillow", "rabbit",
-    "saddle", "tunnel", "violin", "wallet", "yellow", "zipper", "anchor", "basket", "coffee", "dolphin",
-    "engine", "falcon", "glacier", "harbor", "iceberg", "jacket", "kernel", "lemon", "mirror", "needle",
-    "office", "parrot", "quartz", "ribbon", "spider", "turtle", "umbrella", "valley", "walnut", "pepper",
-    "mango", "bottle", "camera", "desert", "eagle", "fabric", "goblet", "helmet", "insect", "jigsaw",
-    "kettle", "lantern", "marble", "nickel", "orchid", "pocket", "quiver", "robot", "sunset", "thunder",
-    "unicorn", "velvet", "whistle", "yogurt", "zebra", "bamboo", "cactus", "diamond", "ember", "feather",
-    "giraffe", "honey", "indigo", "jasmine", "koala", "lotus", "meadow", "noodle", "oyster", "puzzle",
+
+ANIMALS = [
+    "Tiger", "Panda", "Rabbit", "Monkey", "Elephant", "Giraffe", "Dolphin", "Penguin", "Koala", "Parrot",
+    "Turtle", "Zebra", "Lion", "Bear", "Fox", "Wolf", "Owl", "Eagle", "Falcon", "Horse",
+    "Donkey", "Camel", "Kangaroo", "Squirrel", "Hamster", "Kitten", "Puppy", "Goat", "Sheep", "Cow",
+    "Duck", "Chicken", "Crow", "Otter", "Seal", "Whale", "Shark", "Crab", "Frog", "Lizard",
+    "Snake", "Mouse", "Hedgehog", "Raccoon", "Moose", "Bat", "Peacock", "Rhino", "Hippo", "Cheetah",
+]
+
+FOODS = [
+    "Mango", "Banana", "Apple", "Cookie", "Pizza", "Noodles", "Burger", "Cheese", "Honey", "Carrot",
+    "Pancake", "Popcorn", "Cake", "Bread", "Rice", "Pasta", "Grapes", "Lemon", "Orange", "Peach",
+    "Cherry", "Melon", "Berries", "Coconut", "Pumpkin", "Potato", "Tomato", "Corn", "Waffle", "Donut",
+    "Muffin", "Pretzel", "Sandwich", "Chocolate", "Biscuit", "Sausage", "Salad", "Soup", "Mushroom", "Peanuts",
+    "Almonds", "Pineapple", "Papaya", "Kiwi", "Plum", "Pear", "Olive", "Cupcake", "Jelly", "Candy",
+]
+
+VERBS = [
+    "Eats", "Loves", "Wants", "Steals", "Finds", "Shares",
+    "Smells", "Tastes", "Grabs", "Craves", "Likes", "Hides",
 ]
 
 
@@ -102,23 +111,14 @@ def check_breach(password):
             return int(count)
 
     return 0
-def generate_password(length=16):
-    characters = string.ascii_letters + string.digits + "!@#$%^&*"
-    while True:
-        password = "".join(secrets.choice(characters) for _ in range(length))
-        # Keep trying until the password has all 4 character types
-        if (
-            any(c.islower() for c in password)
-            and any(c.isupper() for c in password)
-            and any(c.isdigit() for c in password)
-            and any(c in "!@#$%^&*" for c in password)
-        ):
-            return password
 
-def generate_passphrase(word_count=5):
-    words = [secrets.choice(WORDS).capitalize() for _ in range(word_count)]
-    number = secrets.randbelow(100)
-    return "-".join(words) + "-" + str(number)
+
+def generate_passphrase():
+    animal = secrets.choice(ANIMALS)
+    verb = secrets.choice(VERBS)
+    food = secrets.choice(FOODS)
+    number = secrets.randbelow(90) + 10  # a number from 10 to 99
+    return f"{animal}-{verb}-{food}-{number}"
 
 @app.route("/", methods=["GET", "POST"])
 def index():
@@ -135,17 +135,8 @@ def index():
 
 @app.route("/generate", methods=["POST"])
 def generate():
-    kind = request.form.get("kind", "random")
-    if kind == "passphrase":
-        password = generate_passphrase()
-    else:
-        try:
-            length = int(request.form.get("length", 16))
-        except ValueError:
-            length = 16
-        length = max(12, min(length, 64))
-        password = generate_password(length)
-    return render_template("index.html", generated=password)
+    suggestions = [generate_passphrase() for _ in range(3)]
+    return render_template("index.html", suggestions=suggestions)
 
 if __name__ == "__main__":
     app.run(debug=True, port=5001)
