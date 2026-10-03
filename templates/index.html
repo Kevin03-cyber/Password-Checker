@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Password Checker</title>
+</head>
+<body>
+    <h1>Password Strength Checker</h1>
+
+        <form method="POST" action="/generate">
+        <label>Length:
+            <input type="number" name="length" value="16" min="12" max="64">
+        </label>
+        <button type="submit" name="kind" value="random">Random password</button>
+        <button type="submit" name="kind" value="passphrase">Easy-to-remember passphrase</button>
+    </form>
+
+    {% if result %}
+        <h2>Result: {{ result }}</h2>
+        <ul>
+            {% for tip in tips %}
+                <li>{{ tip }}</li>
+            {% endfor %}
+        </ul>
+
+        {% if breach is not none %}
+            {% if breach == -1 %}
+                <p>The breach check could not run. Check your internet connection.</p>
+            {% elif breach > 0 %}
+                <p><strong>Warning:</strong> this password appeared {{ breach }} times in known data leaks. Do not use it.</p>
+            {% else %}
+                <p>Good news: this password was not found in known data leaks.</p>
+            {% endif %}
+        {% endif %}
+    {% endif %}
+        <h2>Password Generator</h2>
+    <form method="POST" action="/generate">
+        <label>Length:
+            <input type="number" name="length" value="16" min="12" max="64">
+        </label>
+        <button type="submit">Generate</button>
+    </form>
+
+    {% if generated %}
+        <p>Your new password: <code>{{ generated }}</code></p>
+    {% endif %}
+</body>
+</html>
