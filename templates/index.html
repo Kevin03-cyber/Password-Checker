@@ -1,47 +1,250 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Password Checker</title>
+    <style>
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            padding: 40px 16px;
+            font-family: "Segoe UI", Arial, sans-serif;
+            color: #1f2937;
+            background: linear-gradient(135deg, #4f46e5, #9333ea, #ec4899);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        .container { width: 100%; max-width: 520px; }
+
+        h1 {
+            margin: 0 0 4px;
+            text-align: center;
+            font-size: 2rem;
+            color: white;
+        }
+
+        .subtitle {
+            margin: 0 0 24px;
+            text-align: center;
+            color: #f3e8ff;
+        }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+        }
+
+        .card h2 {
+            margin: 0 0 14px;
+            font-size: 1.2rem;
+            color: #4f46e5;
+        }
+
+        .input-row { display: flex; gap: 8px; }
+
+        input[type="password"],
+        input[type="text"],
+        input[type="number"] {
+            width: 100%;
+            padding: 12px 14px;
+            font-size: 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            outline: none;
+        }
+
+        input:focus { border-color: #9333ea; }
+
+        .btn {
+            padding: 12px 18px;
+            font-size: 1rem;
+            font-weight: 600;
+            color: white;
+            cursor: pointer;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #4f46e5, #9333ea);
+        }
+
+        .btn:hover { opacity: 0.9; }
+        .btn-alt { background: linear-gradient(135deg, #ec4899, #f97316); }
+
+        .btn-small {
+            padding: 12px 14px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            color: #4f46e5;
+            background: #ede9fe;
+            border: none;
+            border-radius: 10px;
+        }
+
+        .check-btn { width: 100%; margin-top: 12px; }
+
+        .badge {
+            display: inline-block;
+            padding: 6px 16px;
+            margin-bottom: 12px;
+            font-weight: 700;
+            color: white;
+            border-radius: 999px;
+        }
+
+        .bar-bg {
+            height: 12px;
+            overflow: hidden;
+            background: #e5e7eb;
+            border-radius: 999px;
+        }
+
+        .bar { height: 100%; border-radius: 999px; }
+
+        .weak { background: #ef4444; }
+        .medium { background: #f59e0b; }
+        .strong { background: #22c55e; }
+
+        .bar.weak { width: 33%; }
+        .bar.medium { width: 66%; }
+        .bar.strong { width: 100%; }
+
+        .tips { margin: 14px 0 0; padding-left: 20px; color: #4b5563; }
+        .tips li { margin-bottom: 4px; }
+
+        .alert {
+            margin-top: 14px;
+            padding: 12px 14px;
+            border-radius: 10px;
+            font-size: 0.95rem;
+        }
+
+        .alert.danger { background: #fee2e2; color: #991b1b; }
+        .alert.safe { background: #dcfce7; color: #166534; }
+        .alert.warn { background: #fef3c7; color: #92400e; }
+
+        .length-row { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+        .length-row input { width: 100px; }
+
+        .btn-row { display: flex; gap: 10px; flex-wrap: wrap; }
+
+        .generated {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-top: 16px;
+            padding: 12px 14px;
+            background: #f5f3ff;
+            border: 2px dashed #9333ea;
+            border-radius: 10px;
+        }
+
+        .generated code {
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: #4c1d95;
+            word-break: break-all;
+        }
+
+        .footer {
+            text-align: center;
+            font-size: 0.85rem;
+            color: #f3e8ff;
+        }
+    </style>
 </head>
 <body>
-    <h1>Password Strength Checker</h1>
+    <div class="container">
+        <h1>🔐 Password Checker</h1>
+        <p class="subtitle">Check strength, find leaks, and create strong passwords</p>
 
-        <form method="POST" action="/generate">
-        <label>Length:
-            <input type="number" name="length" value="16" min="12" max="64">
-        </label>
-        <button type="submit" name="kind" value="random">Random password</button>
-        <button type="submit" name="kind" value="passphrase">Easy-to-remember passphrase</button>
-    </form>
+        <div class="card">
+            <h2>Check a password</h2>
+            <form method="POST">
+                <div class="input-row">
+                    <input type="password" id="pw" name="password" placeholder="Type a password">
+                    <button type="button" id="toggleBtn" class="btn-small" onclick="togglePassword()">Show</button>
+                </div>
+                <button type="submit" class="btn check-btn">Check</button>
+            </form>
+        </div>
 
-    {% if result %}
-        <h2>Result: {{ result }}</h2>
-        <ul>
-            {% for tip in tips %}
+        {% if result %}
+        <div class="card">
+            <h2>Result</h2>
+            <span class="badge {{ result|lower }}">{{ result }}</span>
+            <div class="bar-bg"><div class="bar {{ result|lower }}"></div></div>
+
+            {% if tips %}
+            <ul class="tips">
+                {% for tip in tips %}
                 <li>{{ tip }}</li>
-            {% endfor %}
-        </ul>
-
-        {% if breach is not none %}
-            {% if breach == -1 %}
-                <p>The breach check could not run. Check your internet connection.</p>
-            {% elif breach > 0 %}
-                <p><strong>Warning:</strong> this password appeared {{ breach }} times in known data leaks. Do not use it.</p>
-            {% else %}
-                <p>Good news: this password was not found in known data leaks.</p>
+                {% endfor %}
+            </ul>
             {% endif %}
-        {% endif %}
-    {% endif %}
-        <h2>Password Generator</h2>
-    <form method="POST" action="/generate">
-        <label>Length:
-            <input type="number" name="length" value="16" min="12" max="64">
-        </label>
-        <button type="submit">Generate</button>
-    </form>
 
-    {% if generated %}
-        <p>Your new password: <code>{{ generated }}</code></p>
-    {% endif %}
+            {% if breach is not none %}
+                {% if breach == -1 %}
+                <div class="alert warn">The breach check could not run. Check your internet connection.</div>
+                {% elif breach > 0 %}
+                <div class="alert danger"><strong>Warning:</strong> this password appeared {{ '{:,}'.format(breach) }} times in known data leaks. Do not use it.</div>
+                {% else %}
+                <div class="alert safe">Good news: this password was not found in known data leaks.</div>
+                {% endif %}
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <div class="card">
+            <h2>Password generator</h2>
+            <form method="POST" action="/generate">
+                <div class="length-row">
+                    <label for="length">Length</label>
+                    <input type="number" id="length" name="length" value="16" min="12" max="64">
+                </div>
+                <div class="btn-row">
+                    <button type="submit" name="kind" value="random" class="btn">Random password</button>
+                    <button type="submit" name="kind" value="passphrase" class="btn btn-alt">Easy-to-remember passphrase</button>
+                </div>
+            </form>
+
+            {% if generated %}
+            <div class="generated">
+                <code id="generated">{{ generated }}</code>
+                <button type="button" id="copyBtn" class="btn-small" onclick="copyPassword()">Copy</button>
+            </div>
+            {% endif %}
+        </div>
+
+        <p class="footer">Your password is never stored. Only the first 5 characters of its hash are sent for the breach check.</p>
+    </div>
+
+    <script>
+        function togglePassword() {
+            var box = document.getElementById("pw");
+            var btn = document.getElementById("toggleBtn");
+            if (box.type === "password") {
+                box.type = "text";
+                btn.textContent = "Hide";
+            } else {
+                box.type = "password";
+                btn.textContent = "Show";
+            }
+        }
+
+        function copyPassword() {
+            var text = document.getElementById("generated").textContent;
+            navigator.clipboard.writeText(text);
+            document.getElementById("copyBtn").textContent = "Copied!";
+        }
+    </script>
 </body>
 </html>
